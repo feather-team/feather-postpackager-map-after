@@ -21,10 +21,12 @@ module.exports = function(ret, conf, setting, opt){
     if(!feather.config.get('inlineMode')){
         var root = feather.project.getProjectPath();
 
-        if(modulename && modulename != 'common'){
-            feather.util.del(www + '/map/' + ns, null, /common\.php/);
+        if(modulename){
+            if(modulename != 'common'){
+                paffe.util.del(www + '/map/' + ns, null, /common\.php/);
+            }
         }else{
-            feather.util.del(www + '/map/' + ns);
+            paffe.util.del(www + '/map/' + ns);
         }
     }
 
