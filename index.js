@@ -6,8 +6,9 @@ module.exports = function(ret, conf, setting, opt){
 
     if(!feather.config.get('inlineMode')){
         process.push('create-static-template');
-        process.push('create-develop');
     }
+
+    process.push('create-develop');
 
     process.forEach(function(process){
         require('./process/' + process + '.js')(ret, conf, setting, opt); 
