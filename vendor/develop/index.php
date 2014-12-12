@@ -66,9 +66,21 @@ if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){
     if($path[0] == 'test'){
         require LIB_PATH . '/MagicData.class.php';
         $_path = TEST_PATH . '/' . implode('/', array_slice($path, 1));
+
+        if(!is_file($_path)){
+            header("HTTP/1.0 404 Not Found");
+            exit;
+        }
+
         $output = MagicData::parseByFile($_path);
     }else{
         $_path = STATIC_PATH . '/' . implode('/', array_slice($path, 1));
+
+        if(!is_file($_path)){
+            header("HTTP/1.0 404 Not Found");
+            exit;
+        }
+        
         $output = file_get_contents($_path);
     }
 
