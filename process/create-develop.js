@@ -18,7 +18,7 @@ module.exports = function(ret, conf, setting, opt){
     var modulename = feather.config.get('project.modulename'), ns = feather.config.get('project.ns');
     var www = feather.project.getTempPath('www'), php = www + '/php', vendor = __dirname + '/../vendor/develop';
     
-    if(!feather.config.get('inlineMode')){
+    if(!feather.config.get('staticMode')){
         var root = feather.project.getProjectPath();
 
         if(modulename){
@@ -33,7 +33,7 @@ module.exports = function(ret, conf, setting, opt){
     //生成conf
     var hash = {
         ns: ns,
-        inlineMode: feather.config.get('inlineMode'),
+        staticMode: feather.config.get('staticMode'),
         template: {
             suffix: feather.config.get('template.suffix')
         }

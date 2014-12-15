@@ -44,7 +44,7 @@ if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){
     $view->suffix = '.' . $conf['template']['suffix'];
     $view->plugins_dir = ROOT . '/php/plugins';
 
-    if(!$conf['inlineMode']){
+    if(!$conf['staticMode']){
         $view->registerPlugin('feather_view_autoload_static', array(
             'resources' => glob(ROOT . "/map/{$conf['ns']}/**")
         ));

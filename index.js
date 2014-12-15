@@ -4,7 +4,7 @@ module.exports = function(ret, conf, setting, opt){
     //process start
     var process = [];
 
-    if(!feather.config.get('inlineMode')){
+    if(!feather.config.get('staticMode')){
         process.push('create-static-template');
     }
 
