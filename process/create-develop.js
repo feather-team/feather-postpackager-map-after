@@ -23,10 +23,10 @@ module.exports = function(ret, conf, setting, opt){
 
         if(modulename){
             if(modulename != 'common'){
-                paffe.util.del(www + '/map/' + ns, null, /common\.php/);
+                feather.util.del(www + '/map/' + ns, null, /common\.php/);
             }
         }else{
-            paffe.util.del(www + '/map/' + ns);
+            feather.util.del(www + '/map/' + ns);
         }
     }
 
