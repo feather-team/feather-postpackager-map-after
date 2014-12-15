@@ -7,7 +7,7 @@ DEV环境 FEATHER 结合模版引擎 进行本地调试所需要的资源生成
 module.exports = function(ret, conf, setting, opt){
     if(opt.dest != 'preview'){
         feather.util.map(ret.src, function(subpath, file){
-            if(/^\/feather_/.test(subpath)){
+            if(/^\/(?:feather_|test\/)/.test(subpath)){
                 file.release = false;
             }
         });
