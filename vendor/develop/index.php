@@ -40,7 +40,7 @@ if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){
 
     //依赖map表测试的版本
     $view = new Feather_View();
-    $view->template_dir = array(VIEW_PATH);
+    $view->template_dir = array(VIEW_PATH . "/{$conf['ns']}");
     $view->suffix = '.' . $conf['template']['suffix'];
     $view->plugins_dir = ROOT . '/php/plugins';
 
