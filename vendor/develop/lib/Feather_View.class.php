@@ -3,8 +3,6 @@ class Feather_View{
     //默认后缀
     const DEFAULT_SUFFIX = '.tpl';
 
-    private static $sendedHeader = false;
-
     //模版目录，可为数组
     public $template_dir = '';
     //插件目录，不可为数组
@@ -26,8 +24,8 @@ class Feather_View{
     }
 
     //获取值
-    public function get($name = ''){
-        return $name ? $this->data[$name] : $this->data;
+    public function get($name = null){
+        return $name ? isset($this->data[$name]) ? $this->data[$name] : '' : $this->data;
     }
 
     public function __set($name, $value = ''){
@@ -40,24 +38,23 @@ class Feather_View{
 
     //执行模版返回
     public function fetch($path, $data = null, $call_plugins = true){
-        $path = $this->getPath($path);
-        $content = $this->loadFile($path);
-        $data = $data ? $data : $this->get();
+        if(!self::checkHasSuffix($path)){
+            $path = $path . $this->suffix;
+        }
 
-        $call_plugins && $content = $this->callPlugins($path, $content);
-        
-        ob_start();
-        extract($data);
-        eval("?> {$content}");
-        $content = ob_get_clean();
-        ob_end_flush();
-        return $content;
+        $content = $this->loadFile($path);
+
+        //if need to call plugins, call!
+        if($call_plugins){
+            $content = $this->callPlugins($path, $content);
+        }
+
+        return $this->evalContent($data ? $data : $this->get(), $content);
     }
 
     //显示模版
     public function display($path, $charset = 'utf-8', $type = 'text/html'){
-        if(!self::$sendedHeader){
-            self::$sendedHeader = true;
+        if(!headers_sent()){
             header("Content-type: {$type}; charset={$charset}");
         }
 
@@ -66,33 +63,30 @@ class Feather_View{
 
     //调用component
     public function load($path, $data = null){
-        echo $this->fetch("/{$path}", $data, false);
+        echo $this->fetch("{$path}", $data, false);
     }
 
     //加载某一个文件内容
     protected function loadFile($path){
         foreach((array)$this->template_dir as $dir){
-            $_path = $this->getPath($dir . '/' . $path);
+            $_path = $dir . '/' . $path;
 
             if(($content = @file_get_contents($_path)) !== false){
                 break;
             }
         }
 
-        if($content === false){
+        //如果content获取不到，则直接获取path，path可为绝对路径
+        if($content === false && ($content = @file_get_contents($path)) === false){
             throw new Exception($path . ' is not exists!');
         }
 
         return $content;
     }
 
-    //获取正确的路径
-    protected function getPath($path){
-        if(preg_match('/\.[^\.]+$/', $path)){
-            return $path;
-        }
-
-        return $path . $this->suffix;
+    //注册一个插件
+    public function registerPlugin($callback, $opt = array()){
+        $this->plugins[] = array($callback, $opt);
     }
 
     //调用插件
@@ -108,8 +102,22 @@ class Feather_View{
         return $content;
     }
 
-    //注册一个插件
-    public function registerPlugin($callback, $opt = array()){
-        $this->plugins[] = array($callback, $opt);
+    //evaluate content
+    protected function evalContent($data489bc39ff0, $content489bc39ff0){
+        ob_start();
+        //extract data
+        extract($data489bc39ff0);
+        //evaluate code
+        eval("?> {$content489bc39ff0}");
+        //return ob content
+        $content489bc39ff0 = ob_get_clean();
+        //if can flush, flush!
+        ob_get_level() > 0 && ob_end_flush();
+        //return
+        return $content489bc39ff0;
+    }
+
+    protected static function checkHasSuffix($str){
+        return !!preg_match('/\.[^\.]+$/', $str);
     }
 }

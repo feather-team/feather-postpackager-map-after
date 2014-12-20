@@ -2,18 +2,19 @@
 error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', 'On');
 
-define(ROOT, dirname(__FILE__));
-define(LIB_PATH, ROOT . '/php/lib');
+define('ROOT', dirname(__FILE__));
+define('LIB_PATH', ROOT . '/php/lib');
 
-define(TMP_PATH, ROOT . '/php/tmp');
-define(VIEW_PATH, ROOT . '/view');
-define(STATIC_PATH, ROOT . '/static');
-define(TEST_PATH, ROOT . '/test');
+define('TMP_PATH', ROOT . '/php/tmp');
+define('VIEW_PATH', ROOT . '/view');
+define('STATIC_PATH', ROOT . '/static');
+define('TEST_PATH', ROOT . '/test');
 
 $rewrite = (array)load(TMP_PATH . '/feather_rewrite.php');
 $conf = load(TMP_PATH . '/feather_conf.php');
 
 $uri = $_SERVER['REQUEST_URI'];
+$path = null;
 
 foreach ($rewrite as $key => $value){
     preg_match($key, $uri, $match);
@@ -29,8 +30,8 @@ foreach ($rewrite as $key => $value){
 $path = $path ? $path : preg_replace('/[\?#].*/', '', $uri);
 $path = explode('/', trim($path, '/'));
 
-if(!$path[0]) $path = array('page');
-if($path[0] == 'page' && !$path[1]) $path[1] = 'index';
+if(empty($path[0])) $path = array('page');
+if($path[0] == 'page' && empty($path[1])) $path[1] = 'index';
 
 
 if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){

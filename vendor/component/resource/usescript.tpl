@@ -1,7 +1,12 @@
-<?php foreach((array)$outline as $key => $value):?>
-<script src="<?=$value;?>"></script>
-<?php endforeach;?>
+<?php 
+if(!empty($outline)){
+	foreach((array)$outline as $key => $value){
+		echo "<script src='{$value}'></script>";
+	}
+}
 
-<?php foreach((array)$inline as $key => $value):?>
-<script type="text/javascript"><?=$value;?></script>    
-<?php endforeach;?>
+if(!empty($inline)){
+	foreach((array)$inline as $key => $value){
+		echo "<script type='text/javascript'>{$value}</script>";    
+	}
+}
