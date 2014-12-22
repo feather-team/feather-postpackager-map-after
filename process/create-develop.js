@@ -32,7 +32,7 @@ module.exports = function(ret, conf, setting, opt){
 
     //生成conf
     var hash = {
-        domain: opt.domain,
+        domain: opt.domain ? true : false,
         ns: ns,
         staticMode: feather.config.get('staticMode'),
         template: {
