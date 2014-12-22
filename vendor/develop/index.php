@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(E_ALL);
 ini_set('display_errors', 'On');
 
 define('ROOT', dirname(__FILE__));
@@ -46,13 +46,14 @@ if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){
     $view->plugins_dir = ROOT . '/php/plugins';
 
     if(!$conf['staticMode']){
-        $view->registerPlugin('feather_view_autoload_static', array(
+        $view->registerPlugin('autoload_static', array(
+            'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
             'resources' => glob(ROOT . "/map/{$conf['ns']}/**")
         ));
     }
 
     if($path[0] == 'component'){
-        $view->registerPlugin('feather_view_template_position');
+        $view->registerPlugin('static_position');
     }
    
     $path = '/' . preg_replace('/\..+$/', '', implode('/', $path));
@@ -69,7 +70,7 @@ if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){
         $_path = TEST_PATH . '/' . implode('/', array_slice($path, 1));
 
         if(!is_file($_path)){
-            header("HTTP/1.0 404 Not Found");
+            header("{$_SERVER['SERVER_PROTOCOL']} 404 Not Found");
             exit;
         }
 
@@ -78,7 +79,7 @@ if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){
         $_path = STATIC_PATH . '/' . implode('/', array_slice($path, 1));
 
         if(!is_file($_path)){
-            header("HTTP/1.0 404 Not Found");
+            header("{$_SERVER['SERVER_PROTOCOL']} 404 Not Found");
             exit;
         }
         

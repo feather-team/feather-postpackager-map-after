@@ -32,6 +32,7 @@ module.exports = function(ret, conf, setting, opt){
 
     //生成conf
     var hash = {
+        domain: opt.domain,
         ns: ns,
         staticMode: feather.config.get('staticMode'),
         template: {
@@ -45,9 +46,10 @@ module.exports = function(ret, conf, setting, opt){
     //生成本地预览所需要的文件
     [   
         '/lib/Feather_View.class.php',
+        '/lib/Feather_View_Plugin.class.php',
         '/lib/MagicData.class.php',
-        '/plugins/feather_view_autoload_static.plugin.php',
-        '/plugins/feather_view_template_position.plugin.php'
+        '/plugins/feather_view_plugin_autoload_static.php',
+        '/plugins/feather_view_plugin_static_position.php'
     ].forEach(function(path){
         feather.util.write(php + path, feather.file.wrap(vendor + path).getContent());
     });
