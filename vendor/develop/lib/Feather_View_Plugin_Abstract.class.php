@@ -1,5 +1,5 @@
 <?php
-abstract class Feather_View_Plugin{
+abstract class Feather_View_Plugin_Abstract{
 	protected $options = array();
 
 	public function __construct($opt = array()){
