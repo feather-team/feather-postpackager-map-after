@@ -5,6 +5,8 @@ DEV环境 FEATHER 结合模版引擎 进行本地调试所需要的资源生成
 'use strict';
 
 module.exports = function(ret, conf, setting, opt){
+    var staticMode = feather.config.get('staticMode');
+
     if(opt.dest != 'preview'){
         feather.util.map(ret.src, function(subpath, file){
             if(/^\/(?:feather_|test\/)/.test(subpath)){
@@ -18,7 +20,7 @@ module.exports = function(ret, conf, setting, opt){
     var modulename = feather.config.get('project.modulename'), ns = feather.config.get('project.ns');
     var www = feather.project.getTempPath('www'), php = www + '/php', vendor = __dirname + '/../vendor/develop';
     
-    if(!feather.config.get('staticMode')){
+    if(!staticMode){
         var root = feather.project.getProjectPath();
 
         if(modulename){
