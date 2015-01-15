@@ -17,7 +17,7 @@ module.exports = function(ret, conf, setting, opt){
         return;
     }
 
-    var modulename = feather.config.get('project.modulename'), ns = feather.config.get('project.ns');
+    var modulename = feather.config.get('project.modulename'), ns = feather.config.get('project.name');
     var www = feather.project.getTempPath('www'), php = www + '/php', vendor = __dirname + '/../vendor/develop';
     
     if(!staticMode){
