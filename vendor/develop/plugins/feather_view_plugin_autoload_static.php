@@ -158,7 +158,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 			$selfMap = $this->getResources($path);
 
 			if(!isset($selfMap['isPagelet'])){
-				$selfMap = array_merge($this->commonMap, $selfMap);
+				$selfMap = array_merge_recursive($this->commonMap, $selfMap);
 			}
 
 			$headJsInline = array();
