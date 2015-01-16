@@ -76,7 +76,7 @@ if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){
 
         $output = MagicData::parseByFile($_path);
     }else{
-        $_path = STATIC_PATH . '/' . implode('/', array_slice($path, 1));
+        $_path = STATIC_PATH . '/' . implode('/', $path);
 
         if(!is_file($_path)){
             header("{$_SERVER['SERVER_PROTOCOL']} 404 Not Found");

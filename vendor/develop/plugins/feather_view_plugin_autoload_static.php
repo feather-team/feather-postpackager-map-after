@@ -53,7 +53,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 	}
 
 	//获取静态资源正确的url
-	private function getUrl($resources, $returnHash = false, &$hash = array(), &$pkgHash = array()){
+	private function getUrl($resources, $returnHash = false, $withDomain = true, &$hash = array(), &$pkgHash = array()){
 		$tmp = array();
 		$maps = $this->map;
 
@@ -72,11 +72,11 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 						if(!isset($pkgHash[$name])){
 							$pkg = $maps[$name];
 							//缓存
-							$url = $hash[$v] = $pkgHash[$name] = $this->domain . $pkg['url'];
+							$url = $hash[$v] = $pkgHash[$name] = $withDomain ? $this->domain . $pkg['url'] : $pkg['url'];
 
 							//如果pkg有deps，并且不是mod，说明多个非mod文件合并，需要同时加载他们中所有的文件依赖，防止页面报错
 							if(isset($pkg['deps']) && !isset($info['isMod'])){
-								$tmp = array_merge($tmp, $this->getUrl($pkg['deps'], $returnHash, $hash, $pkgHash));
+								$tmp = array_merge($tmp, $this->getUrl($pkg['deps'], $returnHash, $withDomain, $hash, $pkgHash));
 							}
 						}else{
 							$url = $hash[$v] = $pkgHash[$name];
@@ -84,14 +84,14 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 
 						//如果自己有deps，并且是mod，则可以不通过pkg加载依赖，只需要加载自己的依赖就可以了，mod为延迟加载。
 						if(isset($info['deps']) && isset($info['isMod'])){
-							$tmp = array_merge($tmp, $this->getUrl($info['deps'], $returnHash, $hash, $pkgHash));
+							$tmp = array_merge($tmp, $this->getUrl($info['deps'], $returnHash, $withDomain, $hash, $pkgHash));
 						}
 					}else{
-						$url = $hash[$v] = $this->domain . $info['url'];
+						$url = $hash[$v] = $withDomain ? $this->domain . $info['url'] : $info['url'];
 
 						//如果自己有deps，没打包，直接加载依赖
 						if(isset($info['deps'])){
-							$tmp = array_merge($tmp, $this->getUrl($info['deps'], $returnHash, $hash, $pkgHash));
+							$tmp = array_merge($tmp, $this->getUrl($info['deps'], $returnHash, $withDomain, $hash, $pkgHash));
 						}
 					}
 				}else{
@@ -108,7 +108,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 	}
 
 	private function getRequireMD($deps){
-		$hash = $this->getUrl($deps, true);
+		$hash = $this->getUrl($deps, true, false);
 		$mapResult = array();
 		$depsResult = array();
 		$maps = $this->map;
