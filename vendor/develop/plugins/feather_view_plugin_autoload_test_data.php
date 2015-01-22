@@ -49,8 +49,6 @@ class Feather_View_Plugin_Autoload_Test_Data extends Feather_View_Plugin_Abstrac
 
 		$view->set($fData);
 
-		var_dump($fData);
-
 		return $content;
 	}
 }
