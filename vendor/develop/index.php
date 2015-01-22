@@ -41,14 +41,19 @@ if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){
 
     //依赖map表测试的版本
     $view = new Feather_View();
-    $view->template_dir = array(VIEW_PATH . "/{$conf['ns']}");
+    $view->template_dir = array(VIEW_PATH);
     $view->suffix = '.' . $conf['template']['suffix'];
     $view->plugins_dir = ROOT . '/php/plugins';
 
     if(!$conf['staticMode']){
         $view->registerPlugin('autoload_static', array(
             'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
-            'resources' => glob(ROOT . "/map/{$conf['ns']}/**")
+            'resources' => glob(ROOT . "/map/**")
+        ));
+
+        $view->registerPlugin('autoload_test_data', array(
+            'resources' => glob(ROOT . "/map/**"),
+            'data_dir' => TEST_PATH
         ));
     }
 
