@@ -55,7 +55,7 @@ class MagicData{
 
 	protected static function _parse($str){
 		return preg_replace_callback(self::LIMITER_REG, function($match){
-			if($match[2] != null){
+			if(isset($match[2])){
 				return self::dealMutil($match[1], $match[2], $match[3] ? $match[4] ? $match[4] : self::MAX_NUMBER : null);
 			}else{
 				return self::dealSingle($match[1]);
