@@ -14,7 +14,7 @@ class Feather_View_Plugin_Static_Position extends Feather_View_Plugin_Abstract{
             $content .= '
             <?php
             $this->set("FEATHER_BOTTOM_RESOURCE_LOADED", true);
-            $this->load("/component/resource/usescript", $this->get("FEATHER_USE_SCRIPTS"));
+            $this->load("/component/resource/usescript", $this->get("FEATHER_USE_BOTTOM_SCRIPTS"));
             ?>';
         }
         

@@ -13,6 +13,8 @@ define('TEST_PATH', ROOT . '/test');
 $rewrite = (array)load(TMP_PATH . '/feather_rewrite.php');
 $conf = load(TMP_PATH . '/feather_conf.php');
 
+$suffix = '.' . $conf['template']['suffix'];
+
 $uri = $_SERVER['REQUEST_URI'];
 $path = null;
 
@@ -31,10 +33,12 @@ $path = $path ? $path : preg_replace('/[\?#].*/', '', $uri);
 $path = explode('/', trim($path, '/'));
 
 if(empty($path[0])) $path = array('page');
-if($path[0] == 'page' && empty($path[1])) $path[1] = 'index';
+if($path[0] == 'page' && empty($path[1])) $path[1] = 'index' . $suffix;
 
+$tmpPath = implode('/', $path);
+$s = strrchr($tmpPath, '.');
 
-if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){
+if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && ($s === false || $s == $suffix)){
     require LIB_PATH . '/Feather_View.class.php';
 
     load(TMP_PATH . '/feather_compatible.php');
@@ -42,7 +46,7 @@ if($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet'){
     //依赖map表测试的版本
     $view = new Feather_View();
     $view->template_dir = array(VIEW_PATH);
-    $view->suffix = '.' . $conf['template']['suffix'];
+    $view->suffix = $suffix;
     $view->plugins_dir = ROOT . '/php/plugins';
 
     if(!$conf['staticMode']){
