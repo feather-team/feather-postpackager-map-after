@@ -50,7 +50,6 @@ module.exports = function(ret, conf, setting, opt){
         '/lib/Feather_View.class.php',
         '/lib/Feather_View_Plugin_Abstract.class.php',
         '/lib/MagicData.class.php',
-        '/plugins/feather_view_plugin_autoload_static.php',
         '/plugins/feather_view_plugin_static_position.php',
         '/plugins/feather_view_plugin_autoload_test_data.php'
     ].forEach(function(path){

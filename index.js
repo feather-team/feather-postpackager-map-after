@@ -6,6 +6,7 @@ module.exports = function(ret, conf, setting, opt){
 
     if(!feather.config.get('staticMode')){
         process.push('create-static-template');
+        process.push('create-plugins');
     }
 
     process.push('create-develop');
