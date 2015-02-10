@@ -113,7 +113,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		foreach(self::$RESOURCES_TYPE as $type){
 			if(isset($selfMap[$type])){
 				$ms = $selfMap[$type];
-				$tmp = $this->analyseResources($ms, 'deps', true);
+				$tmp = $this->getUrl($ms);
 
 				if($type != 'css'){
 					$final = array();
@@ -127,7 +127,6 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 					}
 
 					$finalResources[$type] = $final;
-					$finalRequires = array_merge($finalRequires, $this->analyseResources($ms, 'requires', false, true, false));
 				}else{
 					$finalResources[$type] = array_merge($tmp, $tmpCss);
 				}
@@ -136,36 +135,21 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 			}
 		}
 
-		if(isset($selfMap['requires'])){
-			$requires = $selfMap['requires'];
-
-			$tmpResources = $this->analyseResources($requires, 'deps', false);
-
-			foreach($tmpResources as $resource){
-				if(strrchr($resource, '.') == '.css'){
-					array_push($finalResources['css'], $resource);
-				}else{
-					array_push($finalResources['bottomJs'], $resource);
-				}
-			}
-
-			$tmpRequires = $this->analyseResources($requires, 'requires', true, true, false);
-			$finalRequires = array_merge($finalRequires, $tmpRequires);
+		if(isset($selfMap['deps'])){
+			$requires = $selfMap['deps'];
+			$finalRequires = $this->getUrl($requires, false, true);
 		}
-
-		//get real url
-		foreach($finalResources as &$resources){
-			$resources = array_unique($resources);
-		}
-
-		unset($resources);
-		//end
 
 		// //get require info
 		$finalMap = array();
 		$finalDeps = array();
 
 		foreach($finalRequires as $key => $value){
+			if(strrchr($key, '.') == '.css' && isset($maps[$key]) && !isset($maps[$key]['isMod'])){
+				array_push($finalResources['css'], $this->domain . $value);
+				continue;
+			}
+
 			if(!isset($finalMap[$value])){
 				$finalMap[$value] = array();
 			}
@@ -175,8 +159,8 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 			if(isset($maps[$key])){
 				$info = $maps[$key];
 
-				if(isset($info['requires']) && isset($info['isMod'])){
-					$finalDeps[$key] = $info['requires'];
+				if(isset($info['deps']) && isset($info['isMod'])){
+					$finalDeps[$key] = $info['deps'];
 				}
 			}
 		}
@@ -186,6 +170,14 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		}
 
 		unset($v);
+
+		//get real url
+		foreach($finalResources as &$resources){
+			$resources = array_unique($resources);
+		}
+
+		unset($resources);
+		//end
 		
 		$finalResources['requires'] = array(
 			'map' => $finalMap,
@@ -195,7 +187,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		return $finalResources;
 	}
 
-	private function analyseResources($resources, $type = 'deps', $collectSelf = false, $returnHash = false, $withDomain = true, &$hash = array(), &$foundHash = array()){
+	private function getUrl($resources, $withDomain = true, $returnHash = false, &$hash = array(), &$pkgHash = array()){
 		$urls = array();
 		$maps = $this->map;
 
@@ -203,81 +195,46 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 			//如果存在
 			if(isset($maps[$v])){
 				$info = $maps[$v];
-
 				//如果未查找过
-				if(!isset($foundHash[$v])){
+				if(!isset($hash[$v])){
 					//如果pack
 					if(isset($info['pkg'])){
-						$pkgName = $info['pkg'];
-
+						$name = $info['pkg'];
+						
 						//如果pkg未查找过
-						if(!isset($foundHash[$pkgName])){
-							$pkg = $maps[$pkgName];
-							$url = $foundHash[$pkgName] = $withDomain ? $this->domain . $pkg['url'] : $pkg['url'];
-
+						if(!isset($pkgHash[$name])){
+							$pkg = $maps[$name];
+							//缓存
+							$url = $hash[$v] = $pkgHash[$name] = $withDomain ? $this->domain . $pkg['url'] : $pkg['url'];
 							//如果pkg有deps，并且不是mod，说明多个非mod文件合并，需要同时加载他们中所有的文件依赖，防止页面报错
-							if(isset($pkg[$type]) && !isset($info['isMod'])){
-								$urls = array_merge($urls, $this->analyseResources($pkg[$type], $type, true, false, $withDomain, $hash, $foundHash));
+							if(isset($pkg['deps']) && !isset($info['isMod'])){
+								$urls = array_merge($urls, $this->getUrl($pkg['deps'], $withDomain, $returnHash, $hash, $pkgHash));
 							}
 						}else{
-							$url = $foundHash[$pkgName];
+							$url = $hash[$v] = $pkgHash[$name];
 						}
-
 						//如果自己有deps，并且是mod，则可以不通过pkg加载依赖，只需要加载自己的依赖就可以了，mod为延迟加载。
-						if(isset($info[$type]) && isset($info['isMod'])){
-							$urls = array_merge($urls, $this->analyseResources($info[$type], $type, true, false, $withDomain, $hash, $foundHash));
+						if(isset($info['deps']) && isset($info['isMod'])){
+							$urls = array_merge($urls, $this->getUrl($info['deps'], $withDomain, $returnHash, $hash, $pkgHash));
 						}
 					}else{
-						$url = $foundHash[$v] = $withDomain ? $this->domain . $info['url'] : $info['url'];
-
+						$url = $hash[$v] = $withDomain ? $this->domain . $info['url'] : $info['url'];
 						//如果自己有deps，没打包，直接加载依赖
-						if(isset($info[$type])){
-							$urls = array_merge($urls, $this->analyseResources($info[$type], $type, true, false, $withDomain, $hash, $foundHash));
+						if(isset($info['deps'])){
+							$urls = array_merge($urls, $this->getUrl($info['deps'], $withDomain, $returnHash, $hash, $pkgHash));
 						}
 					}
 				}else{
-					$url = $foundHash[$v];
+					$url = $hash[$v];
 				}
 			}else{
 				$url = $v;
 			}
-
-			if($collectSelf){
-				$urls[] = $url;
-				$hash[$v] = $url;
-			}
+			
+			$urls[] = $url;
 		}
 
 		return !$returnHash ? array_unique($urls) : $hash;
-	}
-
-	private function getRequireMD($deps){
-		$hash = $this->getUrl($deps, true, false);
-		$mapResult = array();
-		$depsResult = array();
-		$maps = $this->map;
-
-		foreach($hash as $key => $value){
-			if(!isset($mapResult[$value])){
-				$mapResult[$value] = array();
-			}
-
-			$mapResult[$value][] = $key;
-
-			if(isset($maps[$key])){
-				$info = $maps[$key];
-
-				if(isset($info['deps']) && isset($info['isMod'])){
-					$depsResult[$key] = $info['deps'];
-				}
-			}
-		}
-
-		foreach($mapResult as $k => &$v){
-			$v = array_values(array_unique($v));
-		}
-		
-		return array('map' => $mapResult, 'deps' => $depsResult);
 	}
 
 	private function getCache(){
