@@ -109,6 +109,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		$tmpCss = array();
 		$finalResources = array();
 		$finalRequires = array();
+		$requires = array();
 
 		foreach(self::$RESOURCES_TYPE as $type){
 			if(isset($selfMap[$type])){
@@ -140,12 +141,12 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 			$finalRequires = $this->getUrl($requires, false, true);
 		}
 
-		// //get require info
+		//get require info
 		$finalMap = array();
 		$finalDeps = array();
 
 		foreach($finalRequires as $key => $value){
-			if(strrchr($key, '.') == '.css' && isset($maps[$key]) && !isset($maps[$key]['isMod'])){
+			if(!array_search($key, $requires) && strrchr($key, '.') == '.css' && isset($maps[$key]) && !isset($maps[$key]['isMod'])){
 				array_push($finalResources['css'], $this->domain . $value);
 				continue;
 			}
