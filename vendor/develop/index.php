@@ -4,7 +4,7 @@ ini_set('display_errors', 'On');
 
 define('ROOT', dirname(__FILE__));
 define('LIB_PATH', ROOT . '/php/lib');
-
+define('CACHE_PATH', ROOT . '/php/cache');
 define('TMP_PATH', ROOT . '/php/tmp');
 define('VIEW_PATH', ROOT . '/view');
 define('STATIC_PATH', ROOT . '/static');
@@ -49,14 +49,22 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
     $view->suffix = $suffix;
     $view->plugins_dir = ROOT . '/php/plugins';
 
+    Feather_View_Loader::import('Feather_View_Plugin_Cache_File.class.php');
+
+    $cache = new Feather_View_Plugin_Cache_File(array(
+        'cache_dir' => CACHE_PATH
+    ));
+
     if(!$conf['staticMode']){
         $view->registerPlugin('autoload_static', array(
             'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
-            'resources' => glob(ROOT . "/map/**")
+            'maps' => glob(ROOT . "/map/**"),
+            'caching' => true,
+            'cache' => $cache
         ));
 
         $view->registerPlugin('autoload_test_data', array(
-            'resources' => glob(ROOT . "/map/**"),
+            'maps' => glob(ROOT . "/map/**"),
             'data_dir' => TEST_PATH
         ));
     }

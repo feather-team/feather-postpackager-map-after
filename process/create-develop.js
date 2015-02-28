@@ -43,12 +43,15 @@ module.exports = function(ret, conf, setting, opt){
     };
 
     feather.util.write(php + '/tmp/feather_conf.php', '<?php return ' + feather.util.toPhpArray(hash) + ';');
+    feather.util.mkdir(php + '/cache');
     feather.util.write(www + '/index.php', feather.file.wrap(vendor + '/index.php').getContent());
 
     //生成本地预览所需要的文件
     [   
         '/lib/Feather_View.class.php',
         '/lib/Feather_View_Plugin_Abstract.class.php',
+        '/lib/Feather_View_Plugin_Cache_Abstract.class.php',
+        '/lib/Feather_View_Plugin_Cache_File.class.php',
         '/lib/MagicData.class.php',
         '/plugins/feather_view_plugin_static_position.php',
         '/plugins/feather_view_plugin_autoload_test_data.php'
