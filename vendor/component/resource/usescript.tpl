@@ -7,6 +7,6 @@ if(!empty($outline)){
 
 if(!empty($inline)){
 	foreach((array)$inline as $key => $value){
-		echo '<script type="text/javascript">' . $value . '</script>';    
+		echo $value;    
 	}
 }
