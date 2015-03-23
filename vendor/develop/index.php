@@ -58,7 +58,7 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
     if(!$conf['staticMode']){
         $view->registerPlugin('autoload_static', array(
             'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
-            'maps' => glob(ROOT . "/map/**"),
+            'map' => glob(ROOT . "/map/**"),
             'caching' => true,
             'cache' => $cache
         ));

@@ -25,18 +25,26 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 	}
 
 	private function initMapSources(){
-		$sources = $this->getOption('maps');
+		$sources = $this->getOption('map');
 
 		if(empty($sources)){
-			//兼容
-			$sources = $this->getOption('resources');
+			$sources = $this->getOption('maps');
+
+			if(empty($sources)){
+				//兼容
+				$sources = $this->getOption('resources');
+			}	
 		}
 
 		if(empty($sources) && !empty($this->view->template_dir)){
 			$sources = array();
 
 			foreach((array)$this->view->template_dir as $dir){
-				$sources = array_merge($sources, glob($dir . '/../map/**.php'));
+				if(file_exists("{$dir}/map")){
+					$sources = array_merge($sources, glob("{$dir}/map/**.php"));
+				}else{
+					$sources = array_merge($sources, glob("{$dir}/../map/**.php"));
+				}
 			}
 		}
 
@@ -278,11 +286,13 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 	}
 
 	//执行主程
-	public function exec($path, $content = ''){
+	public function exec($content, $info){
+		if($info['isLoad']) return $content;
+
 		$view = $this->view;
 		$view->set('FEATHER_STATIC_DOMAIN', $this->domain);
 
-		$path = '/' . ltrim($path, '/');
+		$path = '/' . ltrim($info['path'], '/');
 		$cache = $this->caching ? $this->getCache()->read($path) : null;
 
 		$lastModifyTime = $this->getMaxMapModifyTime();

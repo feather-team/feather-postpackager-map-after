@@ -29,12 +29,13 @@ class Feather_View_Plugin_Autoload_Test_Data extends Feather_View_Plugin_Abstrac
 		return $selfComponents;
 	}
 
-	public function exec($path, $content){
+	public function exec($content, $info){
 		$this->initMap();
 
 		$testRoot = rtrim($this->getOption('data_dir'), '/') . '/';
 		$fData = array();
 
+		$path = $info['path'];
 		$components = $this->getComponents($path);
 		array_unshift($components, $path);
 
