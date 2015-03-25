@@ -30,6 +30,8 @@ class Feather_View_Plugin_Autoload_Test_Data extends Feather_View_Plugin_Abstrac
 	}
 
 	public function exec($content, $info){
+		if($info['isLoad']) return $content;
+
 		$this->initMap();
 
 		$testRoot = rtrim($this->getOption('data_dir'), '/') . '/';

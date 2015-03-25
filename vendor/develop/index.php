@@ -57,22 +57,17 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
 
     if(!$conf['staticMode']){
         $view->registerPlugin('autoload_static', array(
-            'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
-            'map' => glob(ROOT . "/map/**"),
-            'caching' => true,
-            'cache' => $cache
+            'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : ''
         ));
 
         $view->registerPlugin('autoload_test_data', array(
             'maps' => glob(ROOT . "/map/**"),
             'data_dir' => TEST_PATH
         ));
-    }
 
-    if($path[0] == 'component'){
         $view->registerPlugin('static_position');
     }
-   
+
     $path = '/' . preg_replace('/\..+$/', '', implode('/', $path));
 
     if(!$data = (array)load(TEST_PATH . $path . '.php')){

@@ -2,7 +2,7 @@
 
 module.exports = function(ret, conf, setting, opt){
     //process start
-    var process = [];
+    var process = ['script2bottom'];
 
     if(!feather.config.get('staticMode')){
         process.push('create-static-template');
