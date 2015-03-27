@@ -297,7 +297,11 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 
 		$lastModifyTime = $this->getMaxMapModifyTime();
 
-		if(!$cache || $lastModifyTime > $cache['MAX_LAST_MODIFY_TIME']){
+		if(!$cache 
+			|| !isset($cache['DOMAIN'])
+			|| $this->domain != $cache['DOMAIN'] 
+			|| $lastModifyTime > $cache['MAX_LAST_MODIFY_TIME']
+		){
 			$this->initSelfMap($path);
 			$resources = $this->getSelfResources($path);
 
@@ -321,7 +325,8 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 				'FEATHER_USE_STYLES' => array(
 					'outline' => $resources['css']
 				),
-				'MAX_LAST_MODIFY_TIME' => $lastModifyTime
+				'MAX_LAST_MODIFY_TIME' => $lastModifyTime,
+				'DOMAIN' => $this->domain
 			);
 
 
