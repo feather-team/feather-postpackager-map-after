@@ -77,6 +77,9 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
     $view->set($data);
     $view->display($path);
 }else{
+    $type = getMime($tmpPath);
+    header("Content-type: {$type};");
+
     if($path[0] == 'test'){
         require LIB_PATH . '/MagicData.class.php';
         $_path = TEST_PATH . '/' . implode('/', array_slice($path, 1));
@@ -87,6 +90,8 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
         }
 
         $output = MagicData::parseByFile($_path);
+        echo eval("?>{$output}");
+        exit;
     }else{
         $_path = STATIC_PATH . '/' . implode('/', $path);
 
@@ -96,11 +101,8 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
         }
         
         $output = file_get_contents($_path);
+        echo $output;
     }
-
-    $type = getMime($_path);
-    header("Content-type: {$type};");
-    echo $output;
 }
 
 //加载一个文件
