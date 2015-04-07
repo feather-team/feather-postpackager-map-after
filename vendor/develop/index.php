@@ -49,15 +49,11 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
     $view->suffix = $suffix;
     $view->plugins_dir = ROOT . '/php/plugins';
 
-    Feather_View_Loader::import('Feather_View_Plugin_Cache_File.class.php');
-
-    $cache = new Feather_View_Plugin_Cache_File(array(
-        'cache_dir' => CACHE_PATH
-    ));
-
     if(!$conf['staticMode']){
         $view->registerPlugin('autoload_static', array(
-            'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : ''
+            'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
+            'caching' => true,
+            'cache_dir' => CACHE_PATH
         ));
 
         $view->registerPlugin('autoload_test_data', array(

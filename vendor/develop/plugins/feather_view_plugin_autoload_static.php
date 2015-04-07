@@ -275,7 +275,14 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		if(!$this->cache){
 			$cache = $this->getOption('cache');
 
-			if(is_object($cache) && is_a($cache, 'Feather_View_Plugin_Cache_Abstract')){
+			if(!$cache){
+				//默认使用file 缓存
+				Feather_View_Loader::import('Feather_View_Plugin_Cache_File.class.php');
+
+			    $this->cache = new Feather_View_Plugin_Cache_File(array(
+			        'cache_dir' => $this->getOption('cache_dir')
+			    ));
+			}else if(is_object($cache) && is_a($cache, 'Feather_View_Plugin_Cache_Abstract')){
 				$this->cache = $cache;
 			}else{
 				$this->cache = new $cache;
@@ -326,7 +333,8 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 					'outline' => $resources['css']
 				),
 				'MAX_LAST_MODIFY_TIME' => $lastModifyTime,
-				'DOMAIN' => $this->domain
+				'DOMAIN' => $this->domain,
+				'FILE_PATH' => $info['path']
 			);
 
 
