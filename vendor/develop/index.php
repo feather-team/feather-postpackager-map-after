@@ -57,7 +57,7 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
         ));
 
         $view->registerPlugin('autoload_test_data', array(
-            'maps' => glob(ROOT . "/map/**"),
+            'maps' => glob(VIEW_PATH . '/map/**'),
             'data_dir' => TEST_PATH
         ));
 
