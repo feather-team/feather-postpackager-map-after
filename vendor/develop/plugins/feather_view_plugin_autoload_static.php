@@ -169,10 +169,18 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 			}
 		}
 
+		if(isset($selfMap['async'])){
+			$requires = array_merge($requires, $selfMap['async']);
+		}
+
 		if(isset($selfMap['deps'])){
-			$requires = $selfMap['deps'];
+			$requires = array_merge($requires, $selfMap['deps']);
+		}
+
+		if(!empty($requires)){
 			$finalRequires = $this->getUrl($requires, false, true);
 		}
+
 
 		//get require info
 		$finalMap = array();
@@ -194,7 +202,21 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 				$info = $maps[$key];
 
 				if(isset($info['deps']) && isset($info['isMod'])){
-					$finalDeps[$key] = $info['deps'];
+					if(isset($info['isComponent'])){
+						$deps = array();
+
+						foreach($info['deps'] as $dep){
+							if(strrchr($dep, '.') != '.css'){
+								$deps[] = $dep;
+							}
+						}
+
+						if(!empty($deps)){
+							$finalDeps[$key] = $deps;
+						}
+					}else{
+						$finalDeps[$key] = $info['deps'];
+					}
 				}
 			}
 		}
@@ -241,15 +263,27 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 							//缓存
 							$url = $hash[$v] = $pkgHash[$name] = $withDomain ? $this->domain . $pkg['url'] : $pkg['url'];
 							//如果pkg有deps，并且不是mod，说明多个非mod文件合并，需要同时加载他们中所有的文件依赖，防止页面报错
-							if(isset($pkg['deps']) && !isset($info['isMod'])){
-								$urls = array_merge($urls, $this->getUrl($pkg['deps'], $withDomain, $returnHash, $hash, $pkgHash));
+							if(!isset($info['isMod'])){
+								if(isset($pkg['deps'])){
+									$urls = array_merge($urls, $this->getUrl($pkg['deps'], $withDomain, $returnHash, $hash, $pkgHash));
+								}
+								
+								if(isset($pkg['async'])){
+									$urls = array_merge($urls, $this->getUrl($pkg['async'], $withDomain, $returnHash, $hash, $pkgHash));
+								}
 							}
 						}else{
 							$url = $hash[$v] = $pkgHash[$name];
 						}
 						//如果自己有deps，并且是mod，则可以不通过pkg加载依赖，只需要加载自己的依赖就可以了，mod为延迟加载。
-						if(isset($info['deps']) && isset($info['isMod'])){
-							$urls = array_merge($urls, $this->getUrl($info['deps'], $withDomain, $returnHash, $hash, $pkgHash));
+						if(isset($info['isMod'])){
+							if(isset($info['deps'])){
+								$urls = array_merge($urls, $this->getUrl($info['deps'], $withDomain, $returnHash, $hash, $pkgHash));
+							}
+
+							if(isset($info['async'])){
+								$urls = array_merge($urls, $this->getUrl($info['async'], $withDomain, $returnHash, $hash, $pkgHash));
+							}	
 						}
 					}else{
 						$url = $hash[$v] = $withDomain ? $this->domain . $info['url'] : $info['url'];
@@ -257,6 +291,10 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 						if(isset($info['deps'])){
 							$urls = array_merge($urls, $this->getUrl($info['deps'], $withDomain, $returnHash, $hash, $pkgHash));
 						}
+
+						if(isset($info['async'])){
+							$urls = array_merge($urls, $this->getUrl($info['async'], $withDomain, $returnHash, $hash, $pkgHash));
+						}	
 					}
 				}else{
 					$url = $hash[$v];
