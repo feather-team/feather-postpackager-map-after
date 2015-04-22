@@ -187,7 +187,11 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		$finalDeps = array();
 
 		foreach($finalRequires as $key => $value){
-			if(!array_search($key, $requires) && strrchr($key, '.') == '.css' && isset($maps[$key]) && !isset($maps[$key]['isMod'])){
+			if(!array_search($key, $requires) 
+				&& strrchr($key, '.') == '.css' 
+				&& isset($maps[$key]) 
+				&& (!isset($maps[$key]['isMod']) || isset($maps[$key]['isComponent']))
+			){
 				array_push($finalResources['css'], $this->domain . $value);
 				continue;
 			}
