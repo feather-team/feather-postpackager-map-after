@@ -341,10 +341,11 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		$view = $this->view;
 		$view->set('FEATHER_STATIC_DOMAIN', $this->domain);
 
-		$path = '/' . ltrim($info['path'], '/');
-		$cache = $this->caching ? $this->getCache()->read($path) : null;
-
 		$lastModifyTime = $this->getMaxMapModifyTime();
+
+		$path = '/' . ltrim($info['path'], '/');
+		$rpath = $lastModifyTime . $path;
+		$cache = $this->caching ? $this->getCache()->read($rpath) : null;
 
 		if(!$cache 
 			|| !isset($cache['DOMAIN'])
@@ -381,7 +382,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 
 
 			//如果需要设置缓存
-			$this->caching && $this->getCache()->write($path, $cache);
+			$this->caching && $this->getCache()->write($rpath, $cache);
 		}
 
 		//设置模版值
