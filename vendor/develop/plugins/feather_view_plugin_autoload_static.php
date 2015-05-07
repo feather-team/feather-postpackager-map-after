@@ -344,7 +344,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		$lastModifyTime = $this->getMaxMapModifyTime();
 
 		$path = '/' . ltrim($info['path'], '/');
-		$rpath = $lastModifyTime . $path;
+		$rpath = md5($content) . $path;
 		$cache = $this->caching ? $this->getCache()->read($rpath) : null;
 
 		if(!$cache 
