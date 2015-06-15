@@ -135,7 +135,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		$maps = $this->map;
 		$selfMap = $this->getSelfMap($path);
 
-		if(!isset($selfMap['isPagelet'])){
+		if(!isset($selfMap['isPagelet']) && !empty($selfMap['async'])){
 			$selfMap = array_merge_recursive($this->commonMap, $selfMap);
 		}
 
@@ -171,10 +171,6 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 
 		if(isset($selfMap['async'])){
 			$requires = array_merge($requires, $selfMap['async']);
-		}
-
-		if(isset($selfMap['deps'])){
-			$requires = array_merge($requires, $selfMap['deps']);
 		}
 
 		if(!empty($requires)){
@@ -358,7 +354,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 			//拿到当前文件所有的map信息
 			$headJsInline = array();
 
-			if(!empty($resources['requires']) && $this->useRequire){
+			if(!empty($resources['requires']) && !empty($resources['requires']['map']) && $this->useRequire){
 				$config = $resources['requires'];
 				$config['domain'] = $this->domain;
 				$headJsInline[] = '<script>require.mergeConfig(' . self::jsonEncode($config) . ')</script>';
