@@ -231,16 +231,39 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		//get real url
 		foreach($finalResources as &$resources){
 			$resources = array_unique($resources);
+			$isCombo = false;
 
 			//do combo
 			if(!empty($this->combo) && !empty($resources)){
+				$combos = array();
+				$remotes = array();
+
+				foreach($resources as $v){
+					if(!self::isRemoteUrl($v)){
+						$combos[] = $v;
+					}else{
+						$remotes[] = $v;
+					}
+				}
+
+				$resources = $remotes;
+
+				if(count($combos) > 1){
+					$combos = (!empty($this->combo['domain']) ? $this->combo['domain'] : $this->domain) . '/??' . implode(',', $combos); 
+					$resources[] = $combos;
+				}else{
+					foreach($combos as $v){
+						$resources[] = $this->domain . $v;		
+					}
+				}		
+			}else{
 				foreach($resources as &$v){
-					$v = ltrim($v, '/');
+					if(!self::isRemoteUrl($v)){
+						$v = $this->domain . $v;
+					}
 				}
 
 				unset($v);
-
-				$resources = (!empty($this->combo['domain']) ? $this->combo['domain'] : $this->domain) . '/??' . implode(',', $resources); 
 			}
 		}
 
@@ -401,5 +424,9 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 
 	private static function jsonEncode($v){
     	return str_replace('\\', '', json_encode($v));
+	}
+
+	private static function isRemoteUrl($url){
+		return !!preg_match('#^//|://#', $url);
 	}
 }
