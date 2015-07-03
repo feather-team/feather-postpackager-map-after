@@ -39,7 +39,8 @@ module.exports = function(ret, conf, setting, opt){
         staticMode: feather.config.get('staticMode'),
         template: {
             suffix: feather.config.get('template.suffix')
-        }
+        },
+        combo: feather.config.get('comboDebug')
     };
 
     feather.util.write(php + '/tmp/feather_conf.php', '<?php return ' + feather.util.toPhpArray(hash) + ';');

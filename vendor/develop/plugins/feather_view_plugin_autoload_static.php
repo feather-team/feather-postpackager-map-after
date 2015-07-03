@@ -10,6 +10,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 	private $mapLoaded = array();	//缓存map source
 	private $domain;
 	private $caching;
+	private $combo;
 	private $cache;
 	private static $RESOURCES_TYPE = array('headJs', 'bottomJs', 'css');
 
@@ -21,6 +22,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		}
 
 		$this->caching = $this->getOption('caching');
+		$this->combo = $this->getOption('combo');
 		$this->initMapSources();
 	}
 
@@ -147,7 +149,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		foreach(self::$RESOURCES_TYPE as $type){
 			if(isset($selfMap[$type])){
 				$ms = $selfMap[$type];
-				$tmp = $this->getUrl($ms);
+				$tmp = $this->getUrl($ms, false);
 
 				if($type != 'css'){
 					$final = array();
@@ -177,7 +179,6 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 			$finalRequires = $this->getUrl($requires, false, true);
 		}
 
-
 		//get require info
 		$finalMap = array();
 		$finalDeps = array();
@@ -188,7 +189,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 				&& isset($maps[$key]) 
 				&& (!isset($maps[$key]['isMod']) || isset($maps[$key]['isComponent']))
 			){
-				array_push($finalResources['css'], $this->domain . $value);
+				array_push($finalResources['css'], $value);
 				continue;
 			}
 
@@ -230,6 +231,17 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		//get real url
 		foreach($finalResources as &$resources){
 			$resources = array_unique($resources);
+
+			//do combo
+			if(!empty($this->combo) && !empty($resources)){
+				foreach($resources as &$v){
+					$v = ltrim($v, '/');
+				}
+
+				unset($v);
+
+				$resources = (!empty($this->combo['domain']) ? $this->combo['domain'] : $this->domain) . '/??' . implode(',', $resources); 
+			}
 		}
 
 		unset($resources);

@@ -16,6 +16,23 @@ $conf = load(TMP_PATH . '/feather_conf.php');
 $suffix = '.' . $conf['template']['suffix'];
 
 $uri = $_SERVER['REQUEST_URI'];
+$comboSplit = explode('??', $uri);
+
+if($conf['combo'] && count($comboSplit) > 1){
+    //is combo
+    $tmp_files = explode(',', $comboSplit[1]);
+    $content = array();
+
+    foreach($tmp_files as $v){
+        $type = getMime($v);
+        $content[] = file_get_contents(STATIC_PATH . '/' . $v);
+    }
+
+    header("Content-type: {$type};");
+    echo implode("\r\n", $content);
+    exit;
+}
+
 $path = null;
 
 foreach ($rewrite as $key => $value){
@@ -50,12 +67,19 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
     $view->plugins_dir = ROOT . '/php/plugins';
 
     if(!$conf['staticMode']){
-        $view->registerPlugin('autoload_static', array(
+        $options = array(
             'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
             'caching' => true,
             'cache_dir' => CACHE_PATH
-        ));
+        );
 
+        if($conf['combo']){
+            $options['combo'] = array(
+                'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
+            );
+        }
+
+        $view->registerPlugin('autoload_static', $options);
         $view->registerPlugin('autoload_test_data', array(
             'maps' => glob(VIEW_PATH . '/map/**'),
             'data_dir' => TEST_PATH
