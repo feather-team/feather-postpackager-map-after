@@ -188,7 +188,10 @@ function getMime($path){
     );
 
     $info = pathinfo($path);
-    $type = $type[$info['extension']];
 
-    return $type ? $type : 'text/plain';
+    if(isset($type[$info['extension']])){
+        return $type[$info['extension']];
+    }else{
+        return 'text/plain';
+    }
 }
