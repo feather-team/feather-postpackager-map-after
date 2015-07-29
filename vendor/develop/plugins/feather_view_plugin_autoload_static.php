@@ -12,6 +12,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 	private $caching;
 	private $combo;
 	private $cache;
+	private $pkgUrlCache = array();
 	private static $RESOURCES_TYPE = array('headJs', 'bottomJs', 'css');
 
 	protected function initialize(){
@@ -240,7 +241,13 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 
 				foreach($resources as $v){
 					if(!self::isRemoteUrl($v)){
-						$combos[] = $v;
+						if(empty($this->combo['level']) && array_search($v, $this->pkgUrlCache) === false){
+							$combos[] = $v;
+						}else if(!empty($this->combo['level'])){
+							$combos[] = $v;
+						}else{
+							$remotes[] = $v;
+						}
 					}else{
 						$remotes[] = $v;
 					}
@@ -309,6 +316,9 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 							}
 						}else{
 							$url = $hash[$v] = $pkgHash[$name];
+							if(array_search($url, $this->pkgUrlCache) === false){
+								$this->pkgUrlCache[] = $url;
+							}
 						}
 						//如果自己有deps，并且是mod，则可以不通过pkg加载依赖，只需要加载自己的依赖就可以了，mod为延迟加载。
 						if(isset($info['isMod'])){
