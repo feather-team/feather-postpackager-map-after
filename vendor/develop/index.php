@@ -16,16 +16,17 @@ $conf = load(TMP_PATH . '/feather_conf.php');
 $suffix = '.' . $conf['template']['suffix'];
 
 $uri = $_SERVER['REQUEST_URI'];
+
 $comboSplit = explode('??', $uri);
 
-if($conf['combo'] && count($comboSplit) > 1){
+if(!empty($conf['comboDebug']) && count($comboSplit) > 1){
     //is combo
     $tmp_files = explode(',', $comboSplit[1]);
     $content = array();
 
     foreach($tmp_files as $v){
         $type = getMime($v);
-        $content[] = file_get_contents(STATIC_PATH . '/' . $v);
+        $content[] = file_get_contents(STATIC_PATH . $comboSplit[0] . '/' . $v);
     }
 
     header("Content-type: {$type};");
@@ -69,15 +70,16 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
     if(!$conf['staticMode']){
         $options = array(
             'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
-            'caching' => true,
+            'caching' => false,
             'cache_dir' => CACHE_PATH
         );
 
-        if($conf['combo']){
-            $options['combo'] = array(
-                'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
-                'level' => 0
-            );
+        if($conf['comboDebug'] && $conf['pack']){
+            $options['combo'] = $conf['comboDebug'];
+
+            if($conf['domain'] && empty($options['combo']['domain'])){
+                $options['combo']['domain'] = "http://{$_SERVER['HTTP_HOST']}";
+            }
         }
 
         $view->registerPlugin('autoload_static', $options);

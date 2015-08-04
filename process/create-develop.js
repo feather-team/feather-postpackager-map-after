@@ -40,7 +40,8 @@ module.exports = function(ret, conf, setting, opt){
         template: {
             suffix: feather.config.get('template.suffix')
         },
-        combo: feather.config.get('comboDebug')
+        comboDebug: feather.config.get('comboDebug'),
+        pack: opt.pack ? true : false
     };
 
     feather.util.write(php + '/tmp/feather_conf.php', '<?php return ' + feather.util.toPhpArray(hash) + ';');

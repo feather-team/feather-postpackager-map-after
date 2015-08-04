@@ -2,7 +2,7 @@
 class Feather_View_Plugin_Static_Position extends Feather_View_Plugin_Abstract{
     public function exec($content, $info){
         if(!$info['isLoad'] && strpos($info['path'], '/component/') === 0){
-            if(!preg_match('#</head>#', $content)){
+            if(!preg_match('#<!--FEATHER STATIC POSITION:HEAD-->#', $content)){
                 $content = '
                 <?php  
                 $this->set("FEATHER_HEAD_RESOURCE_LOADED", true);
@@ -11,7 +11,7 @@ class Feather_View_Plugin_Static_Position extends Feather_View_Plugin_Abstract{
                 ?>' . $content;
             }
 
-            if(!preg_match('#</body>#', $content)){
+            if(!preg_match('#<!--FEATHER STATIC POSITION:BOTTOM-->#', $content)){
                 $content .= '
                 <?php
                 $this->set("FEATHER_BOTTOM_RESOURCE_LOADED", true);

@@ -232,7 +232,6 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 		//get real url
 		foreach($finalResources as &$resources){
 			$resources = array_unique($resources);
-			$isCombo = false;
 
 			//do combo
 			if(!empty($this->combo) && !empty($resources)){
@@ -241,9 +240,7 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 
 				foreach($resources as $v){
 					if(!self::isRemoteUrl($v)){
-						if(empty($this->combo['level']) && array_search($v, $this->pkgUrlCache) === false){
-							$combos[] = $v;
-						}else if(!empty($this->combo['level'])){
+						if(empty($this->combo['level']) && array_search($v, $this->pkgUrlCache) === false || !empty($this->combo['level'])){
 							$combos[] = $v;
 						}else{
 							$remotes[] = $v;
@@ -255,14 +252,38 @@ class Feather_View_Plugin_Autoload_Static extends Feather_View_Plugin_Abstract{
 
 				$resources = $remotes;
 
-				if(count($combos) > 1){
-					$combos = (!empty($this->combo['domain']) ? $this->combo['domain'] : $this->domain) . '/??' . implode(',', $combos); 
-					$resources[] = $combos;
-				}else{
-					foreach($combos as $v){
-						$resources[] = $this->domain . $v;		
+				//if same baseurl concat
+				if(!empty($this->combo['sameBaseUrl'])){
+					$combosDirGroup = array();
+
+					foreach($combos as $url){
+						$baseurl = dirname($url);
+						$combosDirGroup[$baseurl][] = $url;
 					}
-				}		
+
+					foreach($combosDirGroup as $dir => $urls){
+						if(count($urls) > 1){
+							$baseNames = array();
+
+							foreach($urls as $url){
+								$baseNames[] = basename($url);
+							}
+
+							$resources[] = (!empty($this->combo['domain']) ? $this->combo['domain'] : $this->domain) . $dir . '??' . implode(',', $baseNames); 
+						}else{
+							$resources[] = $this->domain . $urls[0];
+						}	
+					}	
+				}else{
+					if(count($combos) > 1){
+						$combos = (!empty($this->combo['domain']) ? $this->combo['domain'] : $this->domain) . '/??' . implode(',', $combos); 
+						$resources[] = $combos;
+					}else{
+						foreach($combos as $v){
+							$resources[] = $this->domain . $v;		
+						}
+					}		
+				}
 			}else{
 				foreach($resources as &$v){
 					if(!self::isRemoteUrl($v)){

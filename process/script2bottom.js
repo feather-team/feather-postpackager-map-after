@@ -42,20 +42,16 @@ module.exports = function(ret, conf, setting, opt){
                 }
             }else{
                 if(file.isPageletLike){
-                    if(!/<!--FEATHER STATIC2BOTTOM-->/.test(content)){
-                        content += "<!--FEATHER STATIC2BOTTOM--><?php $this->load('/component/resource/usescript" + suffix + "', array('inline' => $this->get('FEATHER_SCRIPT2BOTTOMS')));?><!--FEATHER STATIC POSITION END-->";
-                    }
+                    content += "<!--FEATHER STATIC2BOTTOM--><?php $this->load('/component/resource/usescript" + suffix + "', array('inline' => $this->get('FEATHER_SCRIPT2BOTTOMS')));?><!--FEATHER STATIC POSITION END-->";
                 }else{
-                    if(!/<!--FEATHER STATIC2BOTTOM-->/.test(content)){
-                        content = content.replace(/<\/body>/i, function(){
-                            return [
-                                "<!--FEATHER STATIC2BOTTOM--><?php " + (debug ? " if(!$this->get('FEATHER_SCRIPT2BOTTOMS_LOADED')){" : ""),
-                                "$this->load('/component/resource/usescript" + suffix + "', array('inline' => $this->get('FEATHER_SCRIPT2BOTTOMS')));",
-                                (debug ? "$this->set('FEATHER_SCRIPT2BOTTOMS_LOADED', true);}" : "") + "?>",
-                                "<!--FEATHER_SCRIPT2BOTTOMS END--></body>"
-                            ].join("");
-                        });
-                    }
+                    content = content.replace(/<!--FEATHER STATIC POSITION:BOTTOM-->[\s\S]*?<!--FEATHER STATIC POSITION END-->/i, function(all){
+                        return all + [
+                            "<!--FEATHER STATIC2BOTTOM--><?php " + (debug ? " if(!$this->get('FEATHER_SCRIPT2BOTTOMS_LOADED')){" : ""),
+                            "$this->load('/component/resource/usescript" + suffix + "', array('inline' => $this->get('FEATHER_SCRIPT2BOTTOMS')));",
+                            (debug ? "$this->set('FEATHER_SCRIPT2BOTTOMS_LOADED', true);}" : "") + "?>",
+                            "<!--FEATHER_SCRIPT2BOTTOMS END-->"
+                        ].join("");
+                    });
                 }
             }
 

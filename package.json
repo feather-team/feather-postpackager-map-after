@@ -1,6 +1,6 @@
 {
   "name": "feather-postpackager-map-after",
-  "version": "0.1.46",
+  "version": "0.1.47",
   "description": "feather postpackager after map",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/feather-ui/feather-postpackager-map-after.git"
+    "url": "https://github.com/feather-team/feather-postpackager-map-after.git"
   },
   "keywords": [
     "feather",
