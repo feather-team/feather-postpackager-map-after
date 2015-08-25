@@ -25,10 +25,12 @@ module.exports = function(ret, conf, setting, opt){
 
         if(modulename){
             if(modulename != 'common'){
-                feather.util.del(www + '/map', null, /common\.php/);
+                feather.util.del(www + '/view/map', null, /common\.php/);
+            }else{
+                feather.util.del(www + '/view/map/map.php');
             }
         }else{
-            feather.util.del(www + '/map');
+            feather.util.del(www + '/view/map');
         }
     }
 
