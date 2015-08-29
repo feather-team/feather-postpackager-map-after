@@ -4,17 +4,36 @@ ini_set('display_errors', 'On');
 
 define('ROOT', dirname(__FILE__));
 define('LIB_PATH', ROOT . '/php/lib');
-define('CACHE_PATH', ROOT . '/php/cache');
-define('TMP_PATH', ROOT . '/php/tmp');
-define('VIEW_PATH', ROOT . '/view');
-define('STATIC_PATH', ROOT . '/static');
-define('TEST_PATH', ROOT . '/test');
+define('STATIC_PATH', ROOT . '/static/');
 
-$rewrite = (array)load(TMP_PATH . '/feather_rewrite.php');
-$conf = load(TMP_PATH . '/feather_conf.php');
+$ns = load(ROOT . '/c_proj', true);
+
+if(isset($_GET['project'])){
+    $ns = $_GET['project'];
+}
+
+define('PROJ_PATH', ROOT . '/proj/' . $ns);
+define('TMP_PATH', PROJ_PATH . '/tmp/');
+define('VIEW_PATH', PROJ_PATH . '/view/');
+define('TEST_PATH', PROJ_PATH . '/test/');
+define('CACHE_PATH', PROJ_PATH . '/cache/');
+
+$conf = load(PROJ_PATH . '/feather_conf.php', true);
+$conf = json_decode($conf, true);
+
+if(empty($conf)){
+    throw new Exception("project [{$ns}] is not exists！");
+}
+
+$rewriteFiles = scandir(TMP_PATH . '/rewrite/');
+$rewrite = array();
+
+foreach($rewriteFiles as $file){
+    if($file == '.' || $file == '..') continue;
+    $rewrite = array_merge($rewrite, (array)load(TMP_PATH . '/rewrite/' . $file));
+}
 
 $suffix = '.' . $conf['template']['suffix'];
-
 $uri = $_SERVER['REQUEST_URI'];
 
 $comboSplit = explode('??', $uri);
@@ -70,7 +89,7 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
     if(!$conf['staticMode']){
         $options = array(
             'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
-            'caching' => false,
+            'caching' => true,
             'cache_dir' => CACHE_PATH
         );
 
@@ -87,7 +106,6 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
             'maps' => glob(VIEW_PATH . '/map/**'),
             'data_dir' => TEST_PATH
         ));
-
         $view->registerPlugin('static_position');
     }
 
@@ -119,6 +137,7 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
 
         if(!is_file($_path)){
             header("{$_SERVER['SERVER_PROTOCOL']} 404 Not Found");
+            header("status: 404 not found"); 
             exit;
         }
         
@@ -130,9 +149,9 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
 }
 
 //加载一个文件
-function load($file){
-    if(file_exists($file)){
-        return require $file; 
+function load($file, $read = false){
+    if(is_file($file)){
+        return $read ? file_get_contents($file) : require $file; 
     }
 }
 

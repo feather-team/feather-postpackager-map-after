@@ -17,20 +17,36 @@ module.exports = function(ret, conf, setting, opt){
         return;
     }
 
-    var modulename = feather.config.get('project.modulename'), ns = feather.config.get('project.name');
+    var modulename = feather.config.get('project.modulename'), ns = feather.config.get('project.name') || 'default';
     var www = feather.project.getTempPath('www'), php = www + '/php', vendor = __dirname + '/../vendor/develop';
+    var proj = www + '/proj/' + ns;
     
+    if(!feather.config.get('deploy.preview')){
+        feather.config.set('deploy.preview', [
+            {
+                from: '/static',
+                //本地目录
+                to: www + '/static',
+                subOnly: true
+            },
+            {
+                from: '/',
+                to: proj,
+                exclude: /^\/static\//,
+                subOnly: true
+            }
+        ]);
+    }
+
     if(!staticMode){
         var root = feather.project.getProjectPath();
 
         if(modulename){
-            if(modulename != 'common'){
-                feather.util.del(www + '/view/map', null, /common\.php/);
-            }else{
-                feather.util.del(www + '/view/map/map.php');
+            if(modulename == 'common'){
+                feather.util.del(proj + '/view/map/map.php');
             }
         }else{
-            feather.util.del(www + '/view/map');
+            feather.util.del(proj + '/view/map');
         }
     }
 
@@ -46,9 +62,10 @@ module.exports = function(ret, conf, setting, opt){
         pack: opt.pack ? true : false
     };
 
-    feather.util.write(php + '/tmp/feather_conf.php', '<?php return ' + feather.util.toPhpArray(hash) + ';');
-    feather.util.mkdir(php + '/cache');
+    feather.util.write(proj + '/feather_conf.php', feather.util.json(hash));
+    feather.util.mkdir(proj + '/cache');
     feather.util.write(www + '/index.php', feather.file.wrap(vendor + '/index.php').getContent());
+    feather.util.write(www + '/c_proj', ns);
 
     //生成本地预览所需要的文件
     [   

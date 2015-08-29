@@ -1,6 +1,11 @@
 'use strict';
 
 module.exports = function(ret, conf, setting, opt){
+    if(feather.config.get('__cwd')){
+        global.process.chdir(feather.config.get('__cwd'));
+    }
+    
+
     //process start
     var process = ['script2bottom'];
 
