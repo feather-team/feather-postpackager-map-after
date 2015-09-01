@@ -8,10 +8,6 @@ define('STATIC_PATH', ROOT . '/static/');
 
 $ns = load(ROOT . '/c_proj', true);
 
-if(isset($_GET['project'])){
-    $ns = $_GET['project'];
-}
-
 define('PROJ_PATH', ROOT . '/proj/' . $ns);
 define('TMP_PATH', PROJ_PATH . '/tmp/');
 define('VIEW_PATH', PROJ_PATH . '/view/');
@@ -25,12 +21,23 @@ if(empty($conf)){
     throw new Exception("project [{$ns}] is not exists！");
 }
 
-$rewriteFiles = scandir(TMP_PATH . '/rewrite/');
+if(is_dir(TMP_PATH . '/rewrite')){
+    $rewriteFiles = scandir(TMP_PATH . '/rewrite/');
+}else{
+    $rewriteFiles = array();
+}
+
 $rewrite = array();
 
 foreach($rewriteFiles as $file){
     if($file == '.' || $file == '..') continue;
-    $rewrite = array_merge($rewrite, (array)load(TMP_PATH . '/rewrite/' . $file));
+    $r = load(TMP_PATH . '/rewrite/' . $file);
+
+    if(!is_array($r)){
+        $r = array();
+    }
+
+    $rewrite = array_merge($rewrite, $r);
 }
 
 $suffix = '.' . $conf['template']['suffix'];
@@ -89,7 +96,7 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
     if(!$conf['staticMode']){
         $options = array(
             'domain' => $conf['domain'] ? "http://{$_SERVER['HTTP_HOST']}" : '',
-            'caching' => true,
+            'caching' => false,
             'cache_dir' => CACHE_PATH
         );
 
@@ -110,8 +117,9 @@ if(($path[0] == 'page' || $path[0] == 'component' || $path[0] == 'pagelet') && (
     }
 
     $path = '/' . preg_replace('/\..+$/', '', implode('/', $path));
+    $data = load(TEST_PATH . $path . '.php');
 
-    if(!$data = (array)load(TEST_PATH . $path . '.php')){
+    if(!is_array($data)){
         $data = array();
     }
 
